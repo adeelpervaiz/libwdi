@@ -2037,6 +2037,62 @@ out:
 	return r;
 }
 
+const char* LIBWDI_API wdi_exec(const char* cmd) {
+	char buffer[256];
+	char *result = (char*)malloc(256);
+	FILE* pPipe;
+
+
+	if ((pPipe = _popen(cmd, "r")) == NULL)
+	{
+		exit(1);
+	}
+
+	/* Read pipe until end of file, or an error occurs. */
+
+	while (fgets(buffer, sizeof(buffer), pPipe))
+	{
+		puts(buffer);
+	}
+	result = &buffer[0];
+
+
+	int endOfFileVal = feof(pPipe);
+	int closeReturnVal = _pclose(pPipe);
+
+	if (endOfFileVal)
+	{
+		printf("\nProcess returned %d\n", closeReturnVal);
+	}
+	else
+	{
+		printf("Error: Failed to read the pipe to the end.\n");
+	}
+
+
+//	// Open pipe to file
+//	FILE* pipe = _popen(cmd, "r");
+//	if (!pipe) {
+//		return "popen failed!";
+//	}
+//
+//	// read till end of process:
+//	while (!feof(pipe)) {
+//
+//		// use buffer to read and add to result
+//		if (fgets(buffer, sizeof(buffer), pipe) != NULL) {
+////			result += (char)buffer;
+////			memcpy(&result, buffer, sizeof(buffer));
+//			result = &buffer[0];
+//
+//		}
+//	}
+//
+//	_pclose(pipe);
+	return result;
+}
+
+
 // Return the WDF version used by the native drivers
 int LIBWDI_API wdi_get_wdf_version(void)
 {

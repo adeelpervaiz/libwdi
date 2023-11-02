@@ -42,6 +42,7 @@
 
 /* embed libusbK driver files from the following location */
 #ifndef LIBUSBK_DIR
+//#define LIBUSBK_DIR "D:/libusbK/bin"
 #define LIBUSBK_DIR "D:/libusbK/bin"
 #endif
 
@@ -51,13 +52,13 @@
 #endif
 
 /* 32 bit support */
-#define OPT_M32
+//#define OPT_M32
 
 /* 64 bit support */
 #define OPT_M64
 
 /* ARM64 support */
-#define OPT_ARM
+//#define OPT_ARM
 
 /* Debug message logging */
 //#define ENABLE_DEBUG_LOGGING

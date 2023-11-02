@@ -301,6 +301,9 @@ LIBWDI_EXP int LIBWDI_API wdi_read_logger(char* buffer, DWORD buffer_size, DWORD
  */
 LIBWDI_EXP int LIBWDI_API wdi_get_wdf_version(void);
 
+LIBWDI_EXP const char* LIBWDI_API wdi_exec(const char* cmd);
+
+
 #ifdef __cplusplus
 }
 #endif
