@@ -231,6 +231,32 @@ int display_devices(void)
 			}
 			dprintf("device : %s %s", dev->desc, dev->hardware_id);
 		}
+		else if (usbDrvMode == IDM_INSTALL_INTERFACE0) {
+			char* ret;
+			ret = strstr(dev->hardware_id, "MI_00");
+
+			char* ret2;
+			ret2 = strstr(dev->hardware_id, "0A8F");
+
+			if (ret == NULL || ret2==NULL) {
+				dprintf("device : %s %s", dev->desc, dev->compatible_id);
+				continue;
+			}
+			dprintf("device INTERFACE0 : %s %s", dev->desc, dev->hardware_id);
+		}
+		else if (usbDrvMode == IDM_INSTALL_INTERFACE1) {
+			char* ret;
+			ret = strstr(dev->hardware_id, "MI_01");
+
+			char* ret2;
+			ret2 = strstr(dev->hardware_id, "0A8F");
+
+			if (ret == NULL || ret2 == NULL) {
+				dprintf("device : %s %s", dev->desc, dev->compatible_id);
+				continue;
+			}
+			dprintf("device INTERFACE1 : %s %s", dev->desc, dev->hardware_id);
+		}
 
 		//char* bcm = "BCM2045A0";
 		//if (safe_strcmp(dev->desc, bcm) == 0) {
@@ -1788,9 +1814,9 @@ INT_PTR CALLBACK main_callback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 		usbDrvMode = IDM_INSTALL_SW_UPDATE;
 		PostMessage(hMainDialog, UM_REFRESH_LIST, 0, 0);
 
-		device = get_selected_device();
-		pd_options.use_wcid_driver = FALSE;
-		SendMessage(hMainDialog, WM_COMMAND, MAKEWPARAM(IDC_INSTALL, BN_CLICKED), BN_CLICKED, BN_CLICKED);
+		//device = get_selected_device();
+		//pd_options.use_wcid_driver = FALSE;
+		//SendMessage(hMainDialog, WM_COMMAND, MAKEWPARAM(IDC_INSTALL, BN_CLICKED), BN_CLICKED, BN_CLICKED);
 
 		const char* result = wdi_exec("C:/Users/adeel/OneDrive/Documents/DeployAPK/bin/release/x64/platform-tools/adb.exe shell am start com.android.settings/.afp.UsbSettings; input keyevent 224; input tap 50 150; 2>&1");
 		dsprintf("result command: %s", result);
@@ -1803,6 +1829,8 @@ INT_PTR CALLBACK main_callback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 		break;
 	}
 	case IDM_INSTALL_INTERFACE0: {
+		usbDrvMode = IDM_INSTALL_INTERFACE0;
+
 		PostMessage(hMainDialog, UM_REFRESH_LIST, 0, 0);
 
 		device = get_selected_device();
@@ -1812,7 +1840,7 @@ INT_PTR CALLBACK main_callback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 
 		dsprintf("Interface 0 Installation Started");
 
-		delay = 2000;
+		delay = 15000;
 		notification_delay_thid = _beginthread(interface1_install_thread, 0, (void*)(uintptr_t)delay);
 		if (notification_delay_thid == -1L) {
 			dprintf("Unable to create notification delay thread - notification events will be disabled");
@@ -1820,6 +1848,14 @@ INT_PTR CALLBACK main_callback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 		break;
 	}
 	case IDM_INSTALL_INTERFACE1: {
+		usbDrvMode = IDM_INSTALL_INTERFACE1;
+		PostMessage(hMainDialog, UM_REFRESH_LIST, 0, 0);
+
+		device = get_selected_device();
+		pd_options.use_wcid_driver = FALSE;
+		SendMessage(hMainDialog, WM_COMMAND, MAKEWPARAM(IDC_INSTALL, BN_CLICKED), BN_CLICKED, BN_CLICKED);
+
+
 		dsprintf("Interface 1 Installation Started");
 
 		break;
@@ -2098,7 +2134,6 @@ INT_PTR CALLBACK main_callback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 		PostQuitMessage(0);
 		destroy_all_tooltips();
 		break;
-
 	default:
 		return (INT_PTR)FALSE;
 
