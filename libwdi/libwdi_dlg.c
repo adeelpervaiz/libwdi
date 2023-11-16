@@ -296,7 +296,7 @@ static LRESULT CALLBACK progress_callback(HWND hDlg, UINT message, WPARAM wParam
 				ShowWindow(hProgressText, SW_SHOW);
 				UpdateWindow(hProgressText);
 				msg_index++;
-			} else if ( (installation_time > 300) && (progress_thid != -1L) ) {
+			} else if ( (installation_time > 120) && (progress_thid != -1L) ) {
 				// Wait 300 (loose) seconds and kill the thread
 				// 300 secs is the timeout for driver installation on Vista
 				wdi_err("progress timeout expired - KILLING THREAD!");
@@ -305,9 +305,15 @@ static LRESULT CALLBACK progress_callback(HWND hDlg, UINT message, WPARAM wParam
 					TerminateThread(handle, -1);
 					CloseHandle(handle);
 				}
-				PostQuitMessage(WDI_ERROR_TIMEOUT);
+				//PostQuitMessage(WDI_ERROR_TIMEOUT);
+				//DestroyWindow(hProgress);
+				//return (INT_PTR)FALSE;
+
+				EnableWindow(GetParent(hDlg), TRUE);
+				PostQuitMessage(0);
 				DestroyWindow(hProgress);
-				return (INT_PTR)FALSE;
+				return (INT_PTR)TRUE;
+
 			}
 		}
 		return (INT_PTR)TRUE;

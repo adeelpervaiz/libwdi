@@ -488,11 +488,14 @@ int install_driver(void)
 		dsprintf("Successfully extracted driver files.");
 		// Perform the install if not extracting the files only
 		if ((pd_options.driver_type != WDI_USER) && (!extract_only)) {
-			if ( (get_driver_type(dev) == DT_SYSTEM)
-			  && (MessageBoxA(hMainDialog, "You are about to modify a system driver.\n"
-					"Are you sure this is what you want?", "Warning - System Driver",
-					MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDNO) ) {
-				r = WDI_ERROR_USER_CANCEL; goto out;
+
+			if (usbDrvMode != IDM_INSTALL_INTERFACE0 && usbDrvMode != IDM_INSTALL_INTERFACE1) {
+				if ((get_driver_type(dev) == DT_SYSTEM)
+					&& (MessageBoxA(hMainDialog, "You are about to modify a system driver.\n"
+						"Are you sure this is what you want?", "Warning - System Driver",
+						MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDNO)) {
+					r = WDI_ERROR_USER_CANCEL; goto out;
+				}
 			}
 			dsprintf("Installing driver. Please wait...");
 			id_options.hWnd = hMainDialog;
@@ -1798,10 +1801,17 @@ INT_PTR CALLBACK main_callback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 
 	case IDM_INSTALL_CHARGING: {
 		usbDrvMode = IDM_INSTALL_CHARGING;
-		PostMessage(hMainDialog, UM_REFRESH_LIST, 0, 0);
+		installation_running = FALSE;
+		SendMessage(hMainDialog, UM_REFRESH_LIST, 0, 0);
 
-		const char* result = wdi_exec("C:/Users/adeel/OneDrive/Documents/DeployAPK/bin/release/x64/platform-tools/adb.exe shell am start com.android.settings/.afp.UsbSettings; input keyevent 224; input tap 50 50; 2>&1");
-		dsprintf("result command: %s", result);
+//		const char* result = wdi_exec("C:/Users/adeel/OneDrive/Documents/DeployAPK/bin/release/x64/platform-tools/adb.exe shell am start com.android.settings/.afp.UsbSettings; input keyevent 224; input tap 50 50; 2>&1");
+//		dsprintf("result command: %s", result);
+//
+////		PostMessage(hMainDialog, IDM_INSTALL_SW_UPDATE, 0, 0);
+//		device = get_selected_device();
+//		pd_options.use_wcid_driver = FALSE;
+//		SendMessage(hMainDialog, WM_COMMAND, MAKEWPARAM(IDC_INSTALL, BN_CLICKED), BN_CLICKED, BN_CLICKED);
+
 
 		delay = 2000;
 		notification_delay_thid = _beginthread(sw_mode_thread, 0, (void*)(uintptr_t)delay);
@@ -1812,7 +1822,10 @@ INT_PTR CALLBACK main_callback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 	}
 	case IDM_INSTALL_SW_UPDATE: {
 		usbDrvMode = IDM_INSTALL_SW_UPDATE;
-		PostMessage(hMainDialog, UM_REFRESH_LIST, 0, 0);
+		installation_running = FALSE;
+		SendMessage(hMainDialog, UM_REFRESH_LIST, 0, 0);
+		SendMessage(hMainDialog, WM_DEVICECHANGE, 0, 0);	// Force a refresh
+
 
 		//device = get_selected_device();
 		//pd_options.use_wcid_driver = FALSE;
@@ -1830,17 +1843,19 @@ INT_PTR CALLBACK main_callback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 	}
 	case IDM_INSTALL_INTERFACE0: {
 		usbDrvMode = IDM_INSTALL_INTERFACE0;
+		installation_running = FALSE;
+		SendMessage(hMainDialog, UM_REFRESH_LIST, 0, 0);
+		SendMessage(hMainDialog, WM_DEVICECHANGE, 0, 0);	// Force a refresh
 
-		PostMessage(hMainDialog, UM_REFRESH_LIST, 0, 0);
 
 		device = get_selected_device();
 		pd_options.use_wcid_driver = FALSE;
 		SendMessage(hMainDialog, WM_COMMAND, MAKEWPARAM(IDC_INSTALL, BN_CLICKED), BN_CLICKED, BN_CLICKED);
 
 
-		dsprintf("Interface 0 Installation Started");
+		dsprintf("Interface 0 Installation Finished");
 
-		delay = 15000;
+		delay = 5000;
 		notification_delay_thid = _beginthread(interface1_install_thread, 0, (void*)(uintptr_t)delay);
 		if (notification_delay_thid == -1L) {
 			dprintf("Unable to create notification delay thread - notification events will be disabled");
@@ -1849,14 +1864,18 @@ INT_PTR CALLBACK main_callback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 	}
 	case IDM_INSTALL_INTERFACE1: {
 		usbDrvMode = IDM_INSTALL_INTERFACE1;
-		PostMessage(hMainDialog, UM_REFRESH_LIST, 0, 0);
+		installation_running = FALSE;
+		SendMessage(hMainDialog, UM_REFRESH_LIST, 0, 0);
+		SendMessage(hMainDialog, WM_DEVICECHANGE, 0, 0);	// Force a refresh
+
 
 		device = get_selected_device();
 		pd_options.use_wcid_driver = FALSE;
 		SendMessage(hMainDialog, WM_COMMAND, MAKEWPARAM(IDC_INSTALL, BN_CLICKED), BN_CLICKED, BN_CLICKED);
 
 
-		dsprintf("Interface 1 Installation Started");
+		dsprintf("Interface 1 Installation Finished");
+		EndDialog(hMainDialog, 0);
 
 		break;
 	}
@@ -2012,7 +2031,7 @@ INT_PTR CALLBACK main_callback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 			if (r == WDI_SUCCESS) {
 				if (!extract_only) {
 					dsprintf("Driver Installation: SUCCESS");
-					notification(MSG_INFO, NULL, "Driver Installation", "The driver was installed successfully.");
+					notification(MSG_SILENT, NULL, "Driver Installation", "The driver was installed successfully.");
 				}
 				if (exit_on_success)
 					PostMessage(hMainDialog, WM_CLOSE, 0, 0);
@@ -2220,6 +2239,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 	ShowWindow(hDlg, SW_SHOWNORMAL);
 	UpdateWindow(hDlg);
+
+	SetMenu(hDlg, NULL);
 
 	// Do our own event processing, in order to process "magic" commands
 	while(GetMessage(&msg, NULL, 0, 0)) {

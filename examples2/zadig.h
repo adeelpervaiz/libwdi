@@ -77,6 +77,7 @@ enum notification_type {
 	MSG_WARNING,
 	MSG_ERROR,
 	MSG_QUESTION,
+	MSG_SILENT,
 };
 typedef INT_PTR (CALLBACK *Callback_t)(HWND, UINT, WPARAM, LPARAM);
 typedef struct {

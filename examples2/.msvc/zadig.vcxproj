@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>zadig2</ProjectName>
+    <ProjectName>dInstaller</ProjectName>
     <ProjectGuid>{3B26856C-7CF0-4D17-92C6-2DD5C8F6FB4B}</ProjectGuid>
     <RootNamespace>zadig</RootNamespace>
     <Keyword>Win32Proj</Keyword>
@@ -200,6 +200,10 @@
       <Project>{9aa0e745-1a0a-4700-8ecb-6a6de9dbf8b9}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\app_logo.bmp" />
+    <Image Include="..\meshimer-icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

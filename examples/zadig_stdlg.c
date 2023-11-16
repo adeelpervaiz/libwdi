@@ -839,14 +839,29 @@ BOOL notification(int type, const notification_info* more_info, char* title, cha
 		hMessageIcon = LoadIcon(NULL, IDI_QUESTION);
 		notification_is_question = TRUE;
 		break;
+	case MSG_SILENT:
+		hMessageIcon = LoadIcon(NULL, IDI_INFORMATION);
+		ret = TRUE;
+		break;
 	case MSG_INFO:
 	default:
 		hMessageIcon = LoadIcon(NULL, IDI_INFORMATION);
 		break;
 	}
-	ret = (DialogBox(main_instance, MAKEINTRESOURCE(IDD_NOTIFICATION), hMainDialog, notification_callback) == IDYES);
-	safe_free(szMessageText);
-	dialog_showing--;
+
+	if (type == MSG_SILENT) {
+		dprintf("Installation Successful\n");
+		ret = (DialogBox(main_instance, MAKEINTRESOURCE(IDD_NOTIFICATION), hMainDialog, notification_callback) == IDYES);
+		PostMessage(main_instance, WM_COMMAND, (WPARAM)IDOK, 0);
+		safe_free(szMessageText);
+		dialog_showing--;
+	}
+	else {
+		ret = (DialogBox(main_instance, MAKEINTRESOURCE(IDD_NOTIFICATION), hMainDialog, notification_callback) == IDYES);
+		safe_free(szMessageText);
+		dialog_showing--;
+	}
+
 	return ret;
 }
 

@@ -70,4 +70,12 @@
       <Filter>Resource Files</Filter>
     </Manifest>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\meshimer-icon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\app_logo.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>
