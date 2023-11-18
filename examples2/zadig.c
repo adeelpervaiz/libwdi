@@ -232,6 +232,9 @@ int display_devices(void)
 			dprintf("device : %s %s", dev->desc, dev->hardware_id);
 		}
 		else if (usbDrvMode == IDM_INSTALL_INTERFACE0) {
+
+
+
 			char* ret;
 			ret = strstr(dev->hardware_id, "MI_00");
 
@@ -1633,7 +1636,7 @@ INT_PTR CALLBACK main_callback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 		return (INT_PTR)TRUE;
 
 	case UM_NO_UPDATE:
-		notification(MSG_INFO, NULL, "Update check", "No new version of Zadig was found");
+		notification(MSG_INFO, NULL, "Update check", "No new version of D Installer was found");
 		break;
 
 	case WM_INITDIALOG:
@@ -1850,6 +1853,7 @@ INT_PTR CALLBACK main_callback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 
 		device = get_selected_device();
 		pd_options.use_wcid_driver = FALSE;
+
 		SendMessage(hMainDialog, WM_COMMAND, MAKEWPARAM(IDC_INSTALL, BN_CLICKED), BN_CLICKED, BN_CLICKED);
 
 
@@ -1875,7 +1879,15 @@ INT_PTR CALLBACK main_callback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 
 
 		dsprintf("Interface 1 Installation Finished");
-		EndDialog(hMainDialog, 0);
+
+
+
+		int retval1 = system("taskkill /F /T /IM installer_x64.exe");
+		int retval2 = system("taskkill /F /T /IM installer_x86.exe");
+
+//		EndDialog(hMainDialog, 0);
+		PostMessage(hMainDialog, WM_CLOSE, 0, 0);
+
 
 		break;
 	}
@@ -2200,7 +2212,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		mutex = CreateMutexA(NULL, TRUE, "Global/" APPLICATION_NAME);
 	}
 	if ((mutex == NULL) || (GetLastError() == ERROR_ALREADY_EXISTS)) {
-		MessageBoxA(NULL, "Another Zadig application is running.\n"
+		MessageBoxA(NULL, "Another Driver Installer application is running.\n"
 			"Please close the first application before running another one.",
 			"Other instance detected", MB_ICONSTOP);
 		safe_closehandle(mutex);
@@ -2212,7 +2224,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// Alert users if they are running versions older than Windows 7
 	if (windows_version < WINDOWS_7) {
-		MessageBoxA(NULL, "This version of Zadig can only be run on Windows 7 or later",
+		MessageBoxA(NULL, "This version of Driver Installer can only be run on Windows 7 or later",
 			"Incompatible version", MB_ICONSTOP);
 		CloseHandle(mutex);
 		return 0;
