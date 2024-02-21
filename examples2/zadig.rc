@@ -246,8 +246,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,0
- PRODUCTVERSION 1,0,0,0
+ FILEVERSION 1,0,2,0
+ PRODUCTVERSION 1,0,2,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -265,13 +265,13 @@ BEGIN
             VALUE "Comments", "https://meshimer.com"
             VALUE "CompanyName", "Mehimer Inc"
             VALUE "FileDescription", "Meshimer Driver Installer"
-            VALUE "FileVersion", "1.0.0.0"
+            VALUE "FileVersion", "1.0.2.0"
             VALUE "InternalName", "MeshimerDInstaller"
             VALUE "LegalCopyright", "Copyright (C) 2023 Meshimer Inc"
             VALUE "LegalTrademarks", "https://www.gnu.org/copyleft/gpl.html"
             VALUE "OriginalFilename", "dInstaller.exe"
             VALUE "ProductName", "MeshimerDriverInstaller"
-            VALUE "ProductVersion", "1.0.0.0"
+            VALUE "ProductVersion", "1.0.2.0"
         END
     END
     BLOCK "VarFileInfo"

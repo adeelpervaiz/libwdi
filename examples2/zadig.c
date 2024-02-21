@@ -1834,7 +1834,18 @@ INT_PTR CALLBACK main_callback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 		//pd_options.use_wcid_driver = FALSE;
 		//SendMessage(hMainDialog, WM_COMMAND, MAKEWPARAM(IDC_INSTALL, BN_CLICKED), BN_CLICKED, BN_CLICKED);
 
-		const char* result = wdi_exec("C:/Users/adeel/OneDrive/Documents/DeployAPK/bin/release/x64/platform-tools/adb.exe shell am start com.android.settings/.afp.UsbSettings; input keyevent 224; input tap 50 150; 2>&1");
+		char adb_cmd[256];   // array to hold the result.
+
+		strcpy(adb_cmd, "\""); // copy string one into the result.
+		strcat(adb_cmd, app_dir); // copy string one into the result.
+		strcat(adb_cmd, "/platform-tools/adb.exe\" shell am start com.android.settings/.afp.UsbSettings; input keyevent 224; input tap 50 150; 2>&1"); // append string two to the result.
+//		strcat(adb_cmd, ""); // copy string one into the result.
+
+//		MessageBoxA(NULL, adb_cmd, adb_cmd, MB_ICONSTOP);
+
+
+
+		const char* result = wdi_exec(adb_cmd);
 		dsprintf("result command: %s", result);
 
 		delay = 2000;
